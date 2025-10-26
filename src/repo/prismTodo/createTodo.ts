@@ -13,7 +13,7 @@ export async function createTodo(body: TodoInput) {
     const todo = await prisma.todo.create({
       data: {
         title,
-        description,
+        description: description || null,
       },
     });
     return todo;

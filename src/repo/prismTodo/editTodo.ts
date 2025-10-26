@@ -14,7 +14,7 @@ export async function editTodo(id: number, body: TodoUpdateInput) {
       where: { id },
       data: {
         title,
-        description,
+        description: description || null,
       },
     });
     return todo;
