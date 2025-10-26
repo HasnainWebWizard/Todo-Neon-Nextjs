@@ -16,6 +16,10 @@ export default function TodoListCont() {
     };
 
     const handleDeleteClick = async (id) => {
+        // Show confirmation dialog
+        const confirmDelete = window.confirm("Are you sure you want to delete this todo?");
+        if (!confirmDelete) return; // exit if user cancels
+
         try {
             setIsDeleting(true);
             const res = await fetch(`/api/todolist/${id}`, {
@@ -28,9 +32,12 @@ export default function TodoListCont() {
             toast.success("Todo deleted successfully");
             setIsDeleting(false);
         } catch (error) {
+            console.error("Delete failed:", error);
+            toast.error("Failed to delete todo");
             setIsDeleting(false);
         }
     };
+
 
     const handleEditClick = (id) => {
         push(`/edit/${id}`); // Use actual todo id here

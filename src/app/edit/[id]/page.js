@@ -4,12 +4,14 @@ import { useRouter, useParams } from "next/navigation";
 
 export default function EditTodo() {
     const { push } = useRouter();
-    const params = useParams();     // ✅ get URL params
-    const id = Number(params.id);   // ✅ convert to number
+    const params = useParams();
+    const id = Number(params.id);
     const [formData, setFormData] = useState({ title: "", description: "" });
+    const [isLoading, setIsLoading] = useState(false); // ✅ new loading state
 
     useEffect(() => {
         const fetchTodo = async () => {
+            setIsLoading(true); // start loading
             try {
                 const res = await fetch(`/api/todolist/${id}`);
                 if (!res.ok) throw new Error("Failed to fetch todo");
@@ -17,6 +19,8 @@ export default function EditTodo() {
                 setFormData({ title: todo.title, description: todo.description });
             } catch (error) {
                 console.error("Error loading todo:", error);
+            } finally {
+                setIsLoading(false); // end loading
             }
         };
         fetchTodo();
@@ -24,12 +28,11 @@ export default function EditTodo() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setIsLoading(true); // start loading on submit
         try {
             const res = await fetch(`/api/todolist/${id}`, {
                 method: "PUT",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(formData),
             });
             if (!res.ok) throw new Error("Failed to submit todo");
@@ -37,6 +40,8 @@ export default function EditTodo() {
             push("/");
         } catch (error) {
             console.error("Form submission to API failed:", error);
+        } finally {
+            setIsLoading(false); // stop loading
         }
     };
 
@@ -52,34 +57,40 @@ export default function EditTodo() {
                         Edit List # <span className="text-white">{id}</span>
                     </h1>
                 </div>
-                <form className="grid grid-cols-2 gap-2" onSubmit={handleSubmit}>
-                    <input
-                        placeholder="Title here"
-                        type="text"
-                        className="p-3 mb-2 rounded bg-white text-black"
-                        name="title"
-                        value={formData.title}
-                        required
-                        onChange={handleChange}
-                    />
-                    <input
-                        placeholder="Description here"
-                        type="text"
-                        className="p-3 mb-2 rounded bg-white text-black"
-                        name="description"
-                        value={formData.description}
-                        required
-                        onChange={handleChange}
-                    />
-                    <div className="flex justify-end col-span-2">
-                        <button
-                            type="submit"
-                            className="col-start-2 px-3 py-2 cursor-pointer bg-yellow-300 text-black active:shadow rounded"
-                        >
-                            Submit
-                        </button>
-                    </div>
-                </form>
+
+                {isLoading ? ( // ✅ show loading indicator
+                    <p className="text-white text-center">Loading...</p>
+                ) : (
+                    <form className="grid grid-cols-2 gap-2" onSubmit={handleSubmit}>
+                        <input
+                            placeholder="Title here"
+                            type="text"
+                            className="p-3 mb-2 rounded bg-white text-black"
+                            name="title"
+                            value={formData.title}
+                            required
+                            onChange={handleChange}
+                        />
+                        <input
+                            placeholder="Description here"
+                            type="text"
+                            className="p-3 mb-2 rounded bg-white text-black"
+                            name="description"
+                            value={formData.description}
+                            required
+                            onChange={handleChange}
+                        />
+                        <div className="flex justify-end col-span-2">
+                            <button
+                                type="submit"
+                                className="col-start-2 px-3 py-2 cursor-pointer bg-yellow-300 text-black active:shadow rounded"
+                                disabled={isLoading} // disable button while loading
+                            >
+                                {isLoading ? "Saving..." : "Submit"}
+                            </button>
+                        </div>
+                    </form>
+                )}
             </section>
         </section>
     );
