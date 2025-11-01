@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { editTodo } from "@/repo/prismTodo/editTodo";
 import { deleteTodo } from "@/repo/prismTodo/deleteTodo";
 
 import { PrismaClient } from "@prisma/client";

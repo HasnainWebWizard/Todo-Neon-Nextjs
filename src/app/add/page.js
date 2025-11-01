@@ -6,13 +6,12 @@ import { toast } from "react-toastify";
 
 export default function Add() {
   const router = useRouter();
-
   const [formData, setFormData] = useState({
     title: "",
     description: "",
   });
 
-  const [isLoading, setIsLoading] = useState(false); // ✅ new loading state
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
